@@ -3,10 +3,7 @@ package app.wallet.controller;
 import app.wallet.dto.WalletDto;
 import app.wallet.service.WalletService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,5 +14,10 @@ public class WalletController {
     @PostMapping("wallet")
     private WalletDto addOperation(@RequestBody WalletDto dto) {
         return walletService.addOperation(dto);
+    }
+
+    @GetMapping("wallets/{uuid}")
+    private WalletDto get(@PathVariable String uuid) {
+        return walletService.get(uuid);
     }
 }

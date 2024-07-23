@@ -29,6 +29,13 @@ public class WalletServiceImpl implements WalletService {
         return toDto(walletRepository.saveAndFlush(wallet));
     }
 
+    @Override
+    public WalletDto get(String uuid) {
+        Wallet wallet = checkAndGet(uuid);
+        log.info("Получения информации о кошельке ИД [{}]", uuid);
+        return toDto(wallet);
+    }
+
     private WalletDto toDto(Wallet wallet) {
         return WalletDto.builder()
                 .walletId(wallet.getWalletId())
@@ -79,14 +86,6 @@ public class WalletServiceImpl implements WalletService {
 
     private Wallet checkAndGet(String walletId) {
         return walletRepository.findById(walletId).orElseThrow(() ->
-                new NotFoundException("Кошелек с  " + walletId + " не найден"));
-    }
-
-    private Wallet toEntity(WalletDto dto) {
-        return Wallet.builder()
-                .walletId(dto.getWalletId())
-                .operationType(dto.getOperationType())
-                .amount(dto.getAmount())
-                .build();
+                new NotFoundException("Кошелек с ИД " + walletId + " не найден"));
     }
 }
