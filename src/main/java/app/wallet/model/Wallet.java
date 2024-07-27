@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 public class Wallet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "walletId")
-    private String walletId;
+    @Column(name = "wallet_id")
+    private Long walletId;
     @Column(name = "operation_type")
     @Enumerated(EnumType.STRING)
     private WalletOperation operationType;

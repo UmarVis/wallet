@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WalletDto {
-    private String walletId;
+    private Long walletId;
     private WalletOperation operationType;
     private Long amount;
 }

@@ -8,7 +8,8 @@ databaseChangeLog:
               columns:
                 - column:
                     name: wallet_id
-                    type: varchar(128)
+                    type: bigint(64)
+                    autoIncrement: true
                     constraints:
                       primaryKey: true
                       nullable: false

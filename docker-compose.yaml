@@ -1,0 +1,24 @@
+# версия Docker Compose
+version: '3.8'
+
+services:
+  db_wallet:
+    image: postgres:13.7-alpine
+    volumes:
+      - /var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=wallet
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+#    ports:
+#      - "5433:5432"
+
+
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db_wallet
+    environment:
+      SPRING_DATASOURCE_URL: 'jdbc:postgresql://db_wallet:5432/wallet'

@@ -31,8 +31,8 @@ public class WalletServiceTest {
     @Test
     void addDepositTest() {
         service = new WalletServiceImpl(walletRepository);
-        WalletDto dto = new WalletDto("1", WalletOperation.DEPOSIT, 1000L);
-        Wallet wallet = new Wallet("1", WalletOperation.DEPOSIT, 1000L);
+        WalletDto dto = new WalletDto(1L, WalletOperation.DEPOSIT, 1000L);
+        Wallet wallet = new Wallet(1L, WalletOperation.DEPOSIT, 1000L);
         Mockito.when(walletRepository.findById(any()))
                 .thenReturn(Optional.of(wallet));
         Mockito.when(walletRepository.saveAndFlush(any()))
@@ -40,14 +40,14 @@ public class WalletServiceTest {
 
         WalletDto testDto = service.addOperation(dto);
 
-        assertEquals(new WalletDto("1", WalletOperation.DEPOSIT, 2000L), testDto);
+        assertEquals(new WalletDto(1L, WalletOperation.DEPOSIT, 2000L), testDto);
     }
 
     @Test
     void addWithdrawTest() {
         service = new WalletServiceImpl(walletRepository);
-        WalletDto dto = new WalletDto("1", WalletOperation.WITHDRAW, 500L);
-        Wallet wallet = new Wallet("1", WalletOperation.WITHDRAW, 1000L);
+        WalletDto dto = new WalletDto(1L, WalletOperation.WITHDRAW, 500L);
+        Wallet wallet = new Wallet(1L, WalletOperation.WITHDRAW, 1000L);
         Mockito.when(walletRepository.findById(any()))
                 .thenReturn(Optional.of(wallet));
         Mockito.when(walletRepository.saveAndFlush(any()))
@@ -55,18 +55,18 @@ public class WalletServiceTest {
 
         WalletDto testDto = service.addOperation(dto);
 
-        assertEquals(new WalletDto("1", WalletOperation.WITHDRAW, 500L), testDto);
+        assertEquals(new WalletDto(1L, WalletOperation.WITHDRAW, 500L), testDto);
     }
 
     @Test
     void getTest() {
         service = new WalletServiceImpl(walletRepository);
-        WalletDto dtoExp = new WalletDto("1", WalletOperation.WITHDRAW, 1000L);
-        Wallet wallet = new Wallet("1", WalletOperation.WITHDRAW, 1000L);
+        WalletDto dtoExp = new WalletDto(1L, WalletOperation.WITHDRAW, 1000L);
+        Wallet wallet = new Wallet(1L, WalletOperation.WITHDRAW, 1000L);
         Mockito.when(walletRepository.findById(any()))
                 .thenReturn(Optional.of(wallet));
 
-        WalletDto dto = service.get("1");
+        WalletDto dto = service.get(1L);
 
         assertEquals(dtoExp, dto);
     }
@@ -85,8 +85,8 @@ public class WalletServiceTest {
     @Test
     void withdrawExceptionTest() {
         service = new WalletServiceImpl(walletRepository);
-        WalletDto dto = new WalletDto("1", WalletOperation.WITHDRAW, 2000L);
-        Wallet wallet = new Wallet("1", WalletOperation.WITHDRAW, 1000L);
+        WalletDto dto = new WalletDto(1L, WalletOperation.WITHDRAW, 2000L);
+        Wallet wallet = new Wallet(1L, WalletOperation.WITHDRAW, 1000L);
 
         Mockito.when(walletRepository.findById(any()))
                 .thenReturn(Optional.of(wallet));
@@ -98,8 +98,8 @@ public class WalletServiceTest {
     @Test
     void deposit0ExceptionTest() {
         service = new WalletServiceImpl(walletRepository);
-        WalletDto dto = new WalletDto("1", WalletOperation.DEPOSIT, 0L);
-        Wallet wallet = new Wallet("1", WalletOperation.DEPOSIT, 0L);
+        WalletDto dto = new WalletDto(1L, WalletOperation.DEPOSIT, 0L);
+        Wallet wallet = new Wallet(1L, WalletOperation.DEPOSIT, 0L);
 
         Mockito.when(walletRepository.findById(any()))
                 .thenReturn(Optional.of(wallet));

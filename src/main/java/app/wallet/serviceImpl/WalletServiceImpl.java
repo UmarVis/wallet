@@ -30,10 +30,27 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public WalletDto get(String uuid) {
+    public WalletDto get(Long uuid) {
         Wallet wallet = checkAndGet(uuid);
         log.info("Получения информации о кошельке ИД [{}]", uuid);
         return toDto(wallet);
+    }
+
+    @Override
+    @Transactional
+    public WalletDto add(WalletDto dto) {
+        Wallet wallet = toEntity(dto);
+        log.info("Сохранен новый кошелек [{}]", dto);
+        return toDto(walletRepository.saveAndFlush(wallet));
+    }
+
+    private Wallet toEntity(WalletDto dto) {
+        Wallet wallet = new Wallet(dto.getWalletId(), dto.getOperationType(), dto.getAmount());
+        return Wallet.builder()
+                .walletId(dto.getWalletId())
+                .operationType(dto.getOperationType())
+                .amount(dto.getAmount())
+                .build();
     }
 
     private WalletDto toDto(Wallet wallet) {
@@ -44,7 +61,7 @@ public class WalletServiceImpl implements WalletService {
                 .build();
     }
 
-    private void fulfillmentOperation(String id, WalletOperation operation, Long amount) {
+    private void fulfillmentOperation(Long id, WalletOperation operation, Long amount) {
         switch (operation) {
             case DEPOSIT:
                 deposit(id, amount);
@@ -55,7 +72,7 @@ public class WalletServiceImpl implements WalletService {
         }
     }
 
-    private void withdraw(String id, Long amount) {
+    private void withdraw(Long id, Long amount) {
         Wallet wallet = checkAndGet(id);
         if (amount > wallet.getAmount()) {
             log.error("Сумма для списания [{}] больше доступной суммы [{}] кошелька ИД [{}]",
@@ -70,7 +87,7 @@ public class WalletServiceImpl implements WalletService {
                 wallet.getOperationType(), wallet.getWalletId(), amount, wallet.getAmount());
     }
 
-    private void deposit(String id, Long amount) {
+    private void deposit(Long id, Long amount) {
         Wallet wallet = checkAndGet(id);
         if (amount <= 0) {
             log.error("Введите сумму больше 0");
@@ -84,7 +101,7 @@ public class WalletServiceImpl implements WalletService {
                 wallet.getOperationType(), wallet.getWalletId(), amount, wallet.getAmount());
     }
 
-    private Wallet checkAndGet(String walletId) {
+    private Wallet checkAndGet(Long walletId) {
         return walletRepository.findById(walletId).orElseThrow(() ->
                 new NotFoundException("Кошелек с ИД " + walletId + " не найден"));
     }

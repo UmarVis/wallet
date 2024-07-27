@@ -43,8 +43,8 @@ public class WalletControllerTest {
 
     @Test
     void getByUuidTest() throws Exception {
-        WalletDto dto = new WalletDto("1", WalletOperation.DEPOSIT, 1000L);
-        when(walletService.get("1")).thenReturn(dto);
+        WalletDto dto = new WalletDto(1L, WalletOperation.DEPOSIT, 1000L);
+        when(walletService.get(1L)).thenReturn(dto);
         mockMvc.perform(get("/api/v1/wallets/{uuid}", 1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.walletId").value("1"))
@@ -54,7 +54,7 @@ public class WalletControllerTest {
 
     @Test
     void addOperationTest() throws Exception {
-        WalletDto dto = new WalletDto("1", WalletOperation.DEPOSIT, 1000L);
+        WalletDto dto = new WalletDto(1L, WalletOperation.DEPOSIT, 1000L);
         String json = mapper.writeValueAsString(dto);
         when(walletService.addOperation(dto)).thenReturn(dto);
 
