@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,7 +39,7 @@ public class WalletServiceTest {
         Mockito.when(walletRepository.saveAndFlush(any()))
                 .thenReturn(wallet);
 
-        WalletDto testDto = service.addOperation(dto);
+        CompletableFuture<WalletDto> testDto = service.addOperation(dto);
 
         assertEquals(new WalletDto(1L, WalletOperation.DEPOSIT, 2000L), testDto);
     }
@@ -53,7 +54,7 @@ public class WalletServiceTest {
         Mockito.when(walletRepository.saveAndFlush(any()))
                 .thenReturn(wallet);
 
-        WalletDto testDto = service.addOperation(dto);
+        CompletableFuture<WalletDto> testDto = service.addOperation(dto);
 
         assertEquals(new WalletDto(1L, WalletOperation.WITHDRAW, 500L), testDto);
     }

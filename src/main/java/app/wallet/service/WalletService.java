@@ -2,10 +2,12 @@ package app.wallet.service;
 
 import app.wallet.dto.WalletDto;
 
+import java.util.concurrent.CompletableFuture;
+
 public interface WalletService {
-    WalletDto addOperation(WalletDto dto);
+    CompletableFuture<WalletDto> addOperation(WalletDto dto);
 
     WalletDto get(Long uuid);
 
-    WalletDto add(WalletDto dto);
+    CompletableFuture<WalletDto> add(WalletDto dto);
 }
