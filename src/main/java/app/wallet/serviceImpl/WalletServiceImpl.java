@@ -2,7 +2,6 @@ package app.wallet.serviceImpl;
 
 import app.wallet.dto.WalletDto;
 import app.wallet.ennumeration.WalletOperation;
-import app.wallet.exceptions.ExceptionAmount;
 import app.wallet.exceptions.NotFoundException;
 import app.wallet.model.Wallet;
 import app.wallet.repository.WalletRepository;
@@ -14,10 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Slf4j
 public class WalletServiceImpl implements WalletService {
     private final WalletRepository walletRepository;
+    private final WithdrawService withdrawService;
+    private final DepositService depositService;
 
     @Override
     @Transactional
@@ -25,11 +25,12 @@ public class WalletServiceImpl implements WalletService {
         log.info("Операция с кошельком: ИД [{}], тип операции [{}], сумма [{}]",
                 dto.getWalletId(), dto.getOperationType(), dto.getAmount());
         Wallet wallet = checkAndGet(dto.getWalletId());
-        fulfillmentOperation(dto.getWalletId(), dto.getOperationType(), dto.getAmount());
+        fulfillmentOperation(wallet, dto.getOperationType(), dto.getAmount());
         return toDto(walletRepository.saveAndFlush(wallet));
     }
 
     @Override
+    @Transactional
     public WalletDto get(Long uuid) {
         Wallet wallet = checkAndGet(uuid);
         log.info("Получения информации о кошельке ИД [{}]", uuid);
@@ -45,7 +46,6 @@ public class WalletServiceImpl implements WalletService {
     }
 
     private Wallet toEntity(WalletDto dto) {
-        Wallet wallet = new Wallet(dto.getWalletId(), dto.getOperationType(), dto.getAmount());
         return Wallet.builder()
                 .walletId(dto.getWalletId())
                 .operationType(dto.getOperationType())
@@ -61,48 +61,19 @@ public class WalletServiceImpl implements WalletService {
                 .build();
     }
 
-    private void fulfillmentOperation(Long id, WalletOperation operation, Long amount) {
+    private void fulfillmentOperation(Wallet wallet, WalletOperation operation, Long amount) {
         switch (operation) {
             case DEPOSIT:
-                deposit(id, amount);
+                depositService.deposit(wallet, amount);
                 break;
             case WITHDRAW:
-                withdraw(id, amount);
+                withdrawService.withdraw(wallet, amount);
                 break;
         }
-    }
-
-    private void withdraw(Long id, Long amount) {
-        Wallet wallet = checkAndGet(id);
-        if (amount > wallet.getAmount()) {
-            log.error("Сумма для списания [{}] больше доступной суммы [{}] кошелька ИД [{}]",
-                    amount, wallet.getAmount(), wallet.getWalletId());
-            throw new ExceptionAmount("Сумма для списания больше доступной суммы кошелька");
-        }
-        long newAmount = wallet.getAmount() - amount;
-        wallet.setAmount(newAmount);
-        wallet.setOperationType(WalletOperation.WITHDRAW);
-        walletRepository.saveAndFlush(wallet);
-        log.info("Операция [{}], с кошелком ИД [{}] проведена, сумма [{}], новая сумма [{}],",
-                wallet.getOperationType(), wallet.getWalletId(), amount, wallet.getAmount());
-    }
-
-    private void deposit(Long id, Long amount) {
-        Wallet wallet = checkAndGet(id);
-        if (amount <= 0) {
-            log.error("Введите сумму больше 0");
-            throw new ExceptionAmount("Введите сумму больше 0");
-        }
-        long newAmount = wallet.getAmount() + amount;
-        wallet.setAmount(newAmount);
-        wallet.setOperationType(WalletOperation.DEPOSIT);
-        walletRepository.saveAndFlush(wallet);
-        log.info("Операция [{}], с кошелком ИД [{}] проведена, сумма [{}], новая сумма [{}],",
-                wallet.getOperationType(), wallet.getWalletId(), amount, wallet.getAmount());
     }
 
     private Wallet checkAndGet(Long walletId) {
-        return walletRepository.findById(walletId).orElseThrow(() ->
+        return walletRepository.findByWalletId(walletId).orElseThrow(() ->
                 new NotFoundException("Кошелек с ИД " + walletId + " не найден"));
     }
 }

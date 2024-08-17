@@ -6,7 +6,9 @@ import app.wallet.exceptions.ExceptionAmount;
 import app.wallet.exceptions.NotFoundException;
 import app.wallet.model.Wallet;
 import app.wallet.repository.WalletRepository;
+import app.wallet.serviceImpl.DepositService;
 import app.wallet.serviceImpl.WalletServiceImpl;
+import app.wallet.serviceImpl.WithdrawService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -25,15 +27,19 @@ public class WalletServiceTest {
 
     @Mock
     WalletRepository walletRepository;
+    @Mock
+    DepositService depositService;
+    @Mock
+    WithdrawService withdrawService;
 
     WalletServiceImpl service;
 
     @Test
     void addDepositTest() {
-        service = new WalletServiceImpl(walletRepository);
+        service = new WalletServiceImpl(walletRepository, withdrawService, depositService);
         WalletDto dto = new WalletDto(1L, WalletOperation.DEPOSIT, 1000L);
-        Wallet wallet = new Wallet(1L, WalletOperation.DEPOSIT, 1000L);
-        Mockito.when(walletRepository.findById(any()))
+        Wallet wallet = new Wallet(1L, WalletOperation.DEPOSIT, 2000L);
+        Mockito.when(walletRepository.findByWalletId(any()))
                 .thenReturn(Optional.of(wallet));
         Mockito.when(walletRepository.saveAndFlush(any()))
                 .thenReturn(wallet);
@@ -45,10 +51,10 @@ public class WalletServiceTest {
 
     @Test
     void addWithdrawTest() {
-        service = new WalletServiceImpl(walletRepository);
+        service = new WalletServiceImpl(walletRepository, withdrawService, depositService);
         WalletDto dto = new WalletDto(1L, WalletOperation.WITHDRAW, 500L);
-        Wallet wallet = new Wallet(1L, WalletOperation.WITHDRAW, 1000L);
-        Mockito.when(walletRepository.findById(any()))
+        Wallet wallet = new Wallet(1L, WalletOperation.WITHDRAW, 500L);
+        Mockito.when(walletRepository.findByWalletId(any()))
                 .thenReturn(Optional.of(wallet));
         Mockito.when(walletRepository.saveAndFlush(any()))
                 .thenReturn(wallet);
@@ -60,10 +66,10 @@ public class WalletServiceTest {
 
     @Test
     void getTest() {
-        service = new WalletServiceImpl(walletRepository);
+        service = new WalletServiceImpl(walletRepository, withdrawService, depositService);
         WalletDto dtoExp = new WalletDto(1L, WalletOperation.WITHDRAW, 1000L);
         Wallet wallet = new Wallet(1L, WalletOperation.WITHDRAW, 1000L);
-        Mockito.when(walletRepository.findById(any()))
+        Mockito.when(walletRepository.findByWalletId(any()))
                 .thenReturn(Optional.of(wallet));
 
         WalletDto dto = service.get(1L);
@@ -73,9 +79,9 @@ public class WalletServiceTest {
 
     @Test
     void getExceptionTest() {
-        service = new WalletServiceImpl(walletRepository);
+        service = new WalletServiceImpl(walletRepository, withdrawService, depositService);
 
-        when(walletRepository.findById(any()))
+        when(walletRepository.findByWalletId(any()))
                 .thenReturn(Optional.empty());
 
         NotFoundException e = assertThrows(NotFoundException.class, () -> service.get(any()));
@@ -84,11 +90,11 @@ public class WalletServiceTest {
 
     @Test
     void withdrawExceptionTest() {
-        service = new WalletServiceImpl(walletRepository);
+        service = new WalletServiceImpl(walletRepository, withdrawService, depositService);
         WalletDto dto = new WalletDto(1L, WalletOperation.WITHDRAW, 2000L);
         Wallet wallet = new Wallet(1L, WalletOperation.WITHDRAW, 1000L);
 
-        Mockito.when(walletRepository.findById(any()))
+        Mockito.when(walletRepository.findByWalletId(any()))
                 .thenReturn(Optional.of(wallet));
 
         ExceptionAmount e = assertThrows(ExceptionAmount.class, () -> service.addOperation(dto));
@@ -97,11 +103,11 @@ public class WalletServiceTest {
 
     @Test
     void deposit0ExceptionTest() {
-        service = new WalletServiceImpl(walletRepository);
+        service = new WalletServiceImpl(walletRepository, withdrawService, depositService);
         WalletDto dto = new WalletDto(1L, WalletOperation.DEPOSIT, 0L);
         Wallet wallet = new Wallet(1L, WalletOperation.DEPOSIT, 0L);
 
-        Mockito.when(walletRepository.findById(any()))
+        Mockito.when(walletRepository.findByWalletId(any()))
                 .thenReturn(Optional.of(wallet));
 
         ExceptionAmount e = assertThrows(ExceptionAmount.class, () -> service.addOperation(dto));

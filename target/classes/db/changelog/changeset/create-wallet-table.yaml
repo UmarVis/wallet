@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+        id: create-wallet
+        author: Umar
+        changes:
+          - createTable:
+              tableName: wallet
+              columns:
+                - column:
+                    name: wallet_id
+                    type: bigint(64)
+                    autoIncrement: true
+                    constraints:
+                      primaryKey: true
+                      nullable: false
+                - column:
+                    name: operation_type
+                    type: varchar(64)
+                    constraints:
+                      nullable: false
+                - column:
+                    name: amount
+                    type: bigint
